@@ -9,12 +9,9 @@ ui <- dashboardPage(
                 menuItem("Click",tabName = "click"),
                 menuItem("Double click",tabName = "dbclick"),
                 menuItem("Hover",tabName = "hover"),
-                menuItem("Brush",tabName = "brush")
-                
-
-                
-                
-                
+                menuItem("Brush",tabName = "brush"),
+                menuItem("Brush & Zoom ",tabName = "zoom")
+      
   )),
   
   dashboardBody(
@@ -54,11 +51,23 @@ ui <- dashboardPage(
               fluidRow(column(12,plotOutput("plot4", brush=brushOpts(id="plot_brush")))),
               br(),
               fluidRow(h4("Points near click"),verbatimTextOutput("brush_info"))
+      ),
+      
+      tabItem(tabName = "zoom",
+              fluidRow(
+                column(12, class = "well",
+                       h4("Brush and double-click to zoom"),
+                       plotOutput("plot5", height = 300,
+                                  dblclick = "plot_dblclick5",
+                                  brush = brushOpts(
+                                    id = "plot_brush5",
+                                    resetOnNew = TRUE)
+                       ))
                 )
-              
-      )
   )
   )
+  )
+)
   
 
 
@@ -124,14 +133,30 @@ server <- function(input, output, session) {
     output$plot4 <- renderPlot({
       ggplot(iris,aes(x=iris$Sepal.Length,shape=Species,col=Species,fill=Species))+geom_histogram(bins=50)
     
-      
-      
       })
     
-     
     })
 
- 
+  ranges <- reactiveValues(x = NULL, y = NULL)
+  
+  output$plot5 <- renderPlot({
+    ggplot(iris, aes(Sepal.Length, Petal.Length)) +
+      geom_point() +
+      coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
+    
+  })
+  
+  observeEvent(input$plot_dblclick5, {
+    brush <- input$plot_brush5
+    if (!is.null(brush)) {
+      ranges$x <- c(brush$xmin, brush$xmax)
+      ranges$y <- c(brush$ymin, brush$ymax)
+      
+    } else {
+      ranges$x <- NULL
+      ranges$y <- NULL
+    }
+  })
   
 }
 
