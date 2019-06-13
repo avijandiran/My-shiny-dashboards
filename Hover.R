@@ -77,7 +77,7 @@ server <- function(input, output, session) {
   iris
   
   output$plot1 <- renderPlot({
-    ggplot(iris,aes(y=iris$Sepal.Length,x=iris$Petal.Length,col=Species,shape=Species))+geom_point()
+    ggplot(iris,aes(y=Sepal.Length,x=Petal.Length,col=Species,shape=Species))+geom_point()
   })
   
   output$click_info <- renderPrint({
@@ -91,13 +91,35 @@ server <- function(input, output, session) {
   })
   
   output$hover_info <- renderPrint({
-    cat("input$plot_hover:\n")
-    str(input$plot_hover)
+    #cat("input$plot_hover:\n")
+    #str(input$plot_hover)
+    
+    hover <- input$plot_hover
+    
+    point <- nearPoints(iris,hover,xvar="Petal.Length",yvar="Sepal.Length",threshold = 10, maxpoints = 1,
+               addDist = TRUE,allRows = FALSE)
+    
+    if (nrow(point) == 0) return(NULL)
+    
+    left_pct <- (hover$x - hover$domain$left) / (hover$domain$right - hover$domain$left)
+    top_pct <- (hover$domain$top - hover$y) / (hover$domain$top - hover$domain$bottom)
+    
+    left_px <- hover$range$left + left_pct * (hover$range$right - hover$range$left)
+    top_px <- hover$range$top + top_pct * (hover$range$bottom - hover$range$top)
+    
+    style <- paste0("position:absolute; z-index:100; background-color: rgba(245, 245, 245, 0.85); ",
+                    "left:", left_px + 2, "px; top:", top_px + 2, "px;")
+    
+    wellPanel(
+      style = style,
+      p(HTML(paste0("<b> wt: </b>", point$Petal.Length, "<br/>",
+                    "<b> mpg: </b>", point$Sepal.Length, "<br/>",))))
   })
  
   output$brush_info <- renderPrint({
-    cat("input$plot_brush:\n")
-    str(input$plot_brush)
+     cat("input$plot_brush:\n")
+     str(input$plot_brush)
+    
   })
   
   
