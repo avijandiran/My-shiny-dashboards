@@ -105,6 +105,8 @@ a <- as.POSIXct(c("2015-01-02 06:07:27", "2015-01-02 06:42:36", "2015-01-02 08:0
 
 b <- c(1,11,4,10,2,8,9)
 
+example_data <- data.frame(a,b)
+
 ggplot(data = example_data, aes(x=a,y=b))+geom_point()+geom_rect(aes(xmin=as.POSIXct(min(example_data$a)),xmax= as.POSIXct(max(example_data$a)),min(example_data$b),max(example_data$b)),fill="white")
 
 scale_x_datetime(labels = date_format( %H-%M"),
@@ -159,4 +161,9 @@ ggplot(data=example_data, aes(x=as.POSIXct(example_data$a), y=b)) +geom_point()+
     
     strptime("2015-01-02 06:07:27", f <- "%Y-%m-%d %H:%M:%OS", tz = "America/Los_Angeles")
     
+    
+    ggplot(data=example_data, aes(x=a, y=b)) +
+    geom_point()+ 
+    geom_rect(aes(xmin=as.POSIXct("2015-01-02 06:07:27",origin="1901-01-01"), xmax=as.POSIXct("2015-01-03 09:42:36",origin="1901-01-01"), ymin=4, ymax=6), fill="white")+
+    axis.POSIXct("2015-01-02 06:07:27", x, format="%Y-%m-%d %H:%M:%S", labels = TRUE)
     
